@@ -11,16 +11,17 @@ ETH = ETH.sort_index(ascending=True)
 ETH_Close = ETH['close']
 ETH_Close = pd.DataFrame(ETH_Close)
 
-fig, ax = plt.subplots()
-ax.plot(BTC_Close, label='BTC')
-ax.plot(ETH_Close, label='ETH')
-ax.set_xlabel('Date')
-ax.set_ylabel('USD')
-ax.legend()
+plt.style.use('bmh')
+fig, ax = plt.subplots(2, 1)
+ax[0].plot(BTC_Close, label='BTC')
+ax[1].plot(ETH_Close, label='ETH')
+ax[0].set_xlabel('Date')
+ax[0].set_ylabel('USD')
+ax[0].set_title('BTC/USD')
+ax[1].set_xlabel('Date')
+ax[1].set_ylabel('USD')
+ax[1].set_title('ETH/USD')
 plt.show()
 
-
 DJI = pd.read_csv('DJI_HistoricalPrices.csv', parse_dates=['Date'])
-
 SP500 = pd.read_csv('SP500_HistoricalPrices.csv', parse_dates=['Date'])
-
