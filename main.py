@@ -7,15 +7,23 @@ BTC = BTC.sort_index(ascending=True)
 BTC_Close = BTC['close']
 BTC_Close = pd.DataFrame(BTC_Close)
 print(BTC_Close.describe())
-returns = BTC_Close.pct_change()*100
-print(returns.head())
+BTC_FirstPrice = BTC.close.iloc[0]
+BTC_Normalised = BTC.close.div(BTC_FirstPrice).mul(100)
 
-ETH = pd.read_csv('Binance_ETHUSD.csv', parse_dates=['date'], index_col='date')  #look at again
+
+'#look at again#'
+ETH = pd.read_csv('Binance_ETHUSD.csv', parse_dates=['date'], index_col='date', low_memory=False)
 print(ETH.info())
 ETH = ETH.sort_index(ascending=True)
 ETH_Close = ETH['close']
 ETH_Close = pd.DataFrame(ETH_Close)
 print(ETH_Close.describe())
+ETH_FirstPrice = ETH.close.iloc[0]
+ETH_Normalised = ETH.close.div(ETH_FirstPrice).mul(100)
+
+DataNorm = pd.DataFrame(data= BTC_Normalised + ETH_Normalised)
+print(DataNorm.head())
+
 
 plt.style.use('bmh')
 fig, ax = plt.subplots(2, 1)
@@ -37,6 +45,11 @@ DJI_Close = pd.DataFrame(DJI_Close)
 print(DJI_Close.head())
 print(DJI_Close.describe())
 
+DJI_FirstPrice = DJI.Close.iloc[0]
+DJI_Normalised = DJI.Close.div(DJI_FirstPrice).mul(100)
+DJI_Normalised.plot()
+plt.show()
+
 SP500 = pd.read_csv('SP500_HistoricalPrices.csv', parse_dates=['Date'], index_col='Date')
 print(SP500.info())
 SP500 = SP500.sort_index(ascending=True)
@@ -56,3 +69,5 @@ ax[1].set_xlabel('Date')
 ax[1].set_ylabel('USD')
 ax[1].set_title('Dow Jones Index')
 plt.show()
+
+NormData = pd.concat([BTC_Normalised, ETH_Normalised])
