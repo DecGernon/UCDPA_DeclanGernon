@@ -2,7 +2,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-BTC = pd.read_csv('Binance_BTCUSD.csv', parse_dates=['date'], index_col='date')
+BTC = pd.read_csv('Binance_BTCUSD.csv', parse_dates=['date'], index_col='date', na_values='n/a')
+BTC = BTC.dropna(axis=1)
 print(BTC.info())
 BTC = BTC.sort_index(ascending=True)
 BTC_Close = BTC['close']
@@ -12,7 +13,6 @@ BTC_FirstPrice = BTC.close.iloc[0]
 BTC_Normalised = BTC.close.div(BTC_FirstPrice).mul(100)
 BTC_NormalisedDF = pd.DataFrame(BTC_Normalised)
 print(BTC_NormalisedDF.head())
-
 
 ETH = pd.read_csv('Binance_ETHUSD.csv', parse_dates=['date'], index_col='date', low_memory=False)
 print(ETH.info())
@@ -34,6 +34,7 @@ print(MergedCrypto.head())
 MergedCrypto.plot(title='Normalised Crypto Returns')
 plt.show()
 
+print(MergedCrypto.corr())
 
 plt.style.use('bmh')
 fig, ax = plt.subplots(2, 1)
@@ -47,26 +48,54 @@ ax[1].set_ylabel('USD')
 ax[1].set_title('ETH/USD')
 plt.show()
 
-DJI = pd.read_csv('DJI_HistoricalPrices.csv', parse_dates=['Date'], index_col='Date')
+DJI = pd.read_csv('DJI_HistoricalPrices.csv', parse_dates=['date'], index_col='date')
 print(DJI.info())
 DJI = DJI.sort_index(ascending=True)
-DJI_Close = DJI['Close']
+DJI_Close = DJI['close']
 DJI_Close = pd.DataFrame(DJI_Close)
 print(DJI_Close.head())
 print(DJI_Close.describe())
 
-DJI_FirstPrice = DJI.Close.iloc[0]
-DJI_Normalised = DJI.Close.div(DJI_FirstPrice).mul(100)
-DJI_Normalised.plot()
-plt.show()
 
-SP500 = pd.read_csv('SP500_HistoricalPrices.csv', parse_dates=['Date'], index_col='Date')
+def normalise(x):
+
+    x_first_price = x.close.iloc[0]
+    x_normalised = x.close.div(x_first_price).mul(100)
+    x_normalised_df = pd.DataFrame(x_normalised)
+
+    return x_normalised_df
+
+
+DJI_NormalisedDF = normalise(DJI)
+print(DJI_NormalisedDF.info())
+print(DJI_NormalisedDF.head())
+
+SP500 = pd.read_csv('SP500_HistoricalPrices.csv', parse_dates=['date'], index_col='date')
 print(SP500.info())
 SP500 = SP500.sort_index(ascending=True)
-SP500_Close = SP500['Close']
+SP500_Close = SP500['close']
 SP500_Close = pd.DataFrame(SP500_Close)
 print(SP500_Close.head())
 print(SP500_Close.describe())
+
+SP500_NormalisedDF = normalise(SP500)
+print(SP500_NormalisedDF.info())
+print(SP500_NormalisedDF.head())
+
+MergedIndices = pd.merge_ordered(DJI_NormalisedDF, SP500_NormalisedDF, on='date')
+MergedIndices = MergedIndices.set_index('date')
+MergedIndices.rename(columns={'close_x': 'Dow Jones Normalised Daily Returns', 'close_y':
+                     'SP500 Normalised Daily Returns'},
+                     inplace=True)
+print(MergedIndices.head())
+print(MergedIndices.info())
+
+MergedDataFrames = pd.merge_ordered(MergedIndices, MergedCrypto, on='date')
+MergedDataFrames = MergedDataFrames.set_index('date')
+print(MergedDataFrames.head())
+MergedDataFrames = MergedDataFrames.dropna(axis=0)
+print(MergedDataFrames.head())
+
 
 plt.style.use('bmh')
 fig, ax = plt.subplots(2, 1)
@@ -79,4 +108,3 @@ ax[1].set_xlabel('Date')
 ax[1].set_ylabel('USD')
 ax[1].set_title('Dow Jones Index')
 plt.show()
-
