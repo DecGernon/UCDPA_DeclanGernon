@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
 
 BTC = pd.read_csv('Binance_BTCUSD.csv', parse_dates=['date'], index_col='date', na_values='n/a')
 BTC = BTC.dropna(axis=1)
@@ -20,6 +21,7 @@ ETH = ETH.sort_index(ascending=True)
 ETH_Close = ETH['close']
 ETH_Close = pd.DataFrame(ETH_Close)
 print(ETH_Close.describe())
+
 ETH_FirstPrice = ETH.close.iloc[0]
 ETH_Normalised = ETH.close.div(ETH_FirstPrice).mul(100)
 ETH_NormalisedDF = pd.DataFrame(ETH_Normalised)
@@ -28,13 +30,13 @@ print(ETH_NormalisedDF.info())
 
 MergedCrypto = pd.merge_ordered(BTC_NormalisedDF, ETH_NormalisedDF, on='date')
 MergedCrypto = MergedCrypto.set_index('date')
-MergedCrypto.rename(columns={'close_x': 'BTC Normalised Daily Returns', 'close_y': 'ETH Normalised Daily Returns'},
+MergedCrypto.rename(columns={'close_x': 'BTC Normalised Growth Rate', 'close_y': 'ETH Normalised Growth Rate'},
                     inplace=True)
-print(MergedCrypto.head())
-MergedCrypto.plot(title='Normalised Crypto Returns')
-plt.show()
 
-print(MergedCrypto.corr())
+CryptoClose = pd.merge_ordered(BTC_Close, ETH_Close, on='date')
+CryptoClose = CryptoClose.set_index('date')
+CryptoClose.rename(columns={'close_x': 'BTC Close', 'close_y': 'ETH Close'}, inplace=True)
+print(CryptoClose.head())
 
 plt.style.use('bmh')
 fig, ax = plt.subplots(2, 1)
@@ -84,11 +86,17 @@ print(SP500_NormalisedDF.head())
 
 MergedIndices = pd.merge_ordered(DJI_NormalisedDF, SP500_NormalisedDF, on='date')
 MergedIndices = MergedIndices.set_index('date')
-MergedIndices.rename(columns={'close_x': 'Dow Jones Normalised Daily Returns', 'close_y':
-                     'SP500 Normalised Daily Returns'},
+MergedIndices.rename(columns={'close_x': 'Dow Jones Normalised Growth Rate', 'close_y':
+                     'SP500 Normalised Growth Rate'},
                      inplace=True)
 print(MergedIndices.head())
 print(MergedIndices.info())
+
+IndicesClose = pd.merge_ordered(DJI_Close, SP500_Close, on='date')
+IndicesClose = IndicesClose.set_index('date')
+IndicesClose.rename(columns={'close_x': 'Dow Jones Close', 'close_y': 'SP500 Close'}, inplace=True)
+print(IndicesClose.head())
+
 
 MergedDataFrames = pd.merge_ordered(MergedIndices, MergedCrypto, on='date')
 MergedDataFrames = MergedDataFrames.set_index('date')
@@ -96,9 +104,18 @@ print(MergedDataFrames.head())
 MergedDataFrames = MergedDataFrames.dropna(axis=0)
 print(MergedDataFrames.head())
 
+MergedClose = pd.merge_ordered(CryptoClose, IndicesClose, on='date')
+MergedClose = MergedClose.set_index('date')
+print(MergedClose.head())
+MergedClose = MergedClose.dropna(axis=0)
+print(MergedClose.head())
+
+ClosePriceCorrelation = MergedClose.corr()
+print(ClosePriceCorrelation.head())
+sns.heatmap(ClosePriceCorrelation, annot=True, cmap="coolwarm").set_title('Price Correlation')
 
 plt.style.use('bmh')
-fig, ax = plt.subplots(2, 1)
+fig1, ax = plt.subplots(2, 1)
 ax[0].plot(SP500_Close, label='SP500')
 ax[1].plot(DJI_Close, label='DJI')
 ax[0].set_xlabel('Date')
