@@ -135,6 +135,10 @@ print(MergedDataFrames.head())
 MergedDataFrames = MergedDataFrames.dropna(axis=0)
 print(MergedDataFrames.head())
 
+plt.style.use('ggplot')
+MergedDataFrames.plot(title='Normalised Growth Rate')
+plt.show()
+
 MergedClose = pd.merge_ordered(CryptoClose, IndicesClose, on='date')
 MergedClose = MergedClose.set_index('date')
 print(MergedClose.head())
@@ -158,6 +162,7 @@ ax[1].set_xlabel('Date')
 ax[1].set_ylabel('USD')
 ax[1].set_title('Dow Jones Index')
 plt.show()
+fig1.savefig('Indices.png')
 
 """Show the future value of 10000 USD invested in each asset on 2017-08-17 until 2021-04-01"""
 
