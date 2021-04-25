@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy_financial as npf
 import seaborn as sns
 
 BTC = pd.read_csv('Binance_BTCUSD.csv', parse_dates=['date'], index_col='date', na_values='n/a')
@@ -125,3 +126,12 @@ ax[1].set_xlabel('Date')
 ax[1].set_ylabel('USD')
 ax[1].set_title('Dow Jones Index')
 plt.show()
+
+EndDateGrowthRate = MergedDataFrames.loc['2021-04-01']
+print(EndDateGrowthRate)
+'#invest 10000 USD on 2017-08-17 until 2021-04-01#'
+FutureValue = 10000 * EndDateGrowthRate/100
+print(FutureValue)
+
+DiscountedValue = np.pv(rate=0.02, nper=4, pmt=0, fv=FutureValue)
+print(DiscountedValue)
