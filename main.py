@@ -63,6 +63,7 @@ ax[1].set_xlabel('Date')
 ax[1].set_ylabel('USD')
 ax[1].set_title('ETH/USD')
 plt.show()
+fig.savefig('Crypto Prices.png')
 
 """import, clean & sort data from CSV files"""
 
@@ -132,12 +133,17 @@ print(IndicesClose.head())
 MergedDataFrames = pd.merge_ordered(MergedIndices, MergedCrypto, on='date')
 MergedDataFrames = MergedDataFrames.set_index('date')
 print(MergedDataFrames.head())
+
+""""Delete weekend prices for the Cryptos"""
+
 MergedDataFrames = MergedDataFrames.dropna(axis=0)
 print(MergedDataFrames.head())
 
 plt.style.use('ggplot')
 MergedDataFrames.plot(title='Normalised Growth Rate')
+plt.savefig('Normalised Growth Rate.png')
 plt.show()
+
 
 MergedClose = pd.merge_ordered(CryptoClose, IndicesClose, on='date')
 MergedClose = MergedClose.set_index('date')
@@ -150,6 +156,7 @@ print(MergedClose.head())
 ClosePriceCorrelation = MergedClose.corr()
 print(ClosePriceCorrelation.head())
 sns.heatmap(ClosePriceCorrelation, annot=True, cmap="coolwarm").set_title('Price Correlation')
+plt.savefig('Price Correlation.png')
 
 plt.style.use('bmh')
 fig1, ax = plt.subplots(2, 1)
@@ -168,14 +175,31 @@ fig1.savefig('Indices.png')
 
 EndDateGrowthRate = MergedDataFrames.loc['2021-04-01']
 print(EndDateGrowthRate)
-FutureValue = 10000 * EndDateGrowthRate/100
-FutureValue = FutureValue.rename(index={'Dow Jones Normalised Growth Rate': 'Dow Jones Future Value',
-                                        'SP500 Normalised Growth Rate': 'SP500 Future Value',
-                                        'BTC Normalised Growth Rate': 'BTC Future Value',
-                                        'ETH Normalised Growth Rate': 'ETH Future Value'})
-print(FutureValue)
+FutureValues = 10000 * EndDateGrowthRate/100
+FutureValues = FutureValues.rename(index={'Dow Jones Normalised Growth Rate': 'Dow Jones Future Value',
+                                          'SP500 Normalised Growth Rate': 'SP500 Future Value',
+                                          'BTC Normalised Growth Rate': 'BTC Future Value',
+                                          'ETH Normalised Growth Rate': 'ETH Future Value'})
+print(FutureValues)
+
+for a in FutureValues:
+    if a == FutureValues[0]:
+        print('10,000 USD invested in the SP500 on 2017-08-17 would be worth', round(a, 2), 'USD as at 2021-04-01.')
+for b in FutureValues:
+    if b == FutureValues[1]:
+        print('10,000 USD invested in the SP500 on 2017-08-17 would be worth', round(b, 2), 'USD as at 2021-04-01.')
+for c in FutureValues:
+    if c == FutureValues[2]:
+        print('10,000 USD invested in the BitCoin on 2017-08-17 would be worth', round(c, 2), 'USD as at 2021-04-01.')
+for d in FutureValues:
+    if d == FutureValues[3]:
+        print('10,000 USD invested in the Ethereum on 2017-08-17 would be worth', round(d, 2), 'USD as at 2021-04-01.')
+
 
 """Discount the future values assuming an inflation rate 2% and approx 4 year period"""
 
-DiscountedValue = npf.pv(rate=0.02, nper=4, pmt=0, fv=-FutureValue)
-print(DiscountedValue)
+DiscountedValues = npf.pv(rate=0.02, nper=4, pmt=0, fv=-FutureValues)
+print(DiscountedValues)
+
+for z in DiscountedValues:
+    print(round(z, 2))
